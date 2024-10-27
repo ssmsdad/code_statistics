@@ -36,8 +36,10 @@ auto CppAnalyzer::GetRawStringTail(std::string_view const& line, size_t offset)
 
     // construct raw_delimiter: )de"
     raw_string_tail.push_back(')');
+    // 将de加入到raw_string_tail中
     raw_string_tail += line.substr(begin, end - begin);
     raw_string_tail.push_back('"');
+    // 最终的raw_string_tail为)de"
     return raw_string_tail;
 }
 

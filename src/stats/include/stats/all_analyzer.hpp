@@ -21,6 +21,7 @@ class AllAnalyzer : public CodeAnalyzer {
     auto GetAnalyzer(std::string const& path) -> std::shared_ptr<CodeAnalyzer>;
     virtual auto Analyze(std::string const& path)
         -> std::shared_ptr<AnalysisResult> override;
+    virtual ~AllAnalyzer() = default;
 };
 
 auto MakeAllAnalyzer() -> std::shared_ptr<AllAnalyzer>;

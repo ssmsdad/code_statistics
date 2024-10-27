@@ -7,6 +7,7 @@
 #include "stats/python_analyzer.hpp"
 #include "stats/rust_analyzer.hpp"
 #include <algorithm>
+#include <filesystem>
 #include <fmt/core.h>
 #include <fstream>
 #include <memory>
@@ -20,7 +21,7 @@ AllAnalyzer::AllAnalyzer()
 
 auto AllAnalyzer::GetAnalyzer(std::string const& path)
     -> std::shared_ptr<CodeAnalyzer> {
-    std::filesystem::path fs_path(path);
+    fs::path fs_path(path);
     std::string extension = fs_path.extension().string();
     if (extension == ".py") {
         return python_analyzer_;

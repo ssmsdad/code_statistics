@@ -23,8 +23,10 @@ class Conf {
 
   private:
     std::list<fs::path> load_paths_;
+    // 用于存储程序当前需要分析的文件后缀名
     std::list<std::string> extensions_;
 
+    // 用于存储支持的语言和对应的文件后缀名
     const std::map<std::string, std::vector<std::string>> language_extensions_ =
         {{"cpp", {".h", ".hpp", ".c", ".cpp", ".cc", ".cxx", ".hxx"}},
          {"rust", {".rs"}},

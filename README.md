@@ -38,3 +38,7 @@ for more infomation, use `code_statistics -h` to see help.
 4. `cd code_statistics`
 5. `conan install . --build=missing`
 6. `conan build .`
+
+
+这是第一个完全读懂的c++项目，甚至还参与了一小部分的开发
+虽然是个小项目，但是也值得记录一下，希望以后能读懂大项目，到最后甚至可以参与大项目的开发

@@ -19,13 +19,16 @@ class CodeAnalyzer {
     CodeAnalyzer(std::string const& line_comment_head,
                  std::string const& block_comment_head,
                  std::string const& block_comment_tail);
+    virtual ~CodeAnalyzer() = default;
 
+    // 这些是虚函数，子类可以重写，并且是暴露给外部的接口
     virtual auto Analyze(std::string const& path)
         -> std::shared_ptr<AnalysisResult>;
     virtual auto Init() -> void;
     virtual std::shared_ptr<AnalysisResult> AnalyzeFile(std::istream& is);
 
   protected:
+    // 这些是内部函数，子类不应该重写，并且是不暴露给外部的接口
     auto GetLineAndResetOffset(std::istream& is, std::string& line,
                                size_t& offset) -> std::istream&;
     auto FindFirstNotBlank(std::string const& line, size_t offset) -> size_t;
@@ -34,6 +37,7 @@ class CodeAnalyzer {
         -> void;
 
   protected:
+    // 这些是虚函数，子类可以重写，并且是不暴露给外部的接口
     virtual auto IsStringHead(std::string_view const& line, size_t offset)
         -> bool;
     virtual auto IsRawStringHead(std::string_view const& line, size_t offset)

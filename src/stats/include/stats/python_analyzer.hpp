@@ -10,6 +10,7 @@ namespace stats {
 class PythonAnalyzer : public CodeAnalyzer {
   public:
     PythonAnalyzer();
+    // 确保通过基类指针删除派生类对象时，能够正确调用派生类的析构函数
     virtual ~PythonAnalyzer() = default;
 
   private:

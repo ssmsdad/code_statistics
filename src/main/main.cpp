@@ -11,6 +11,7 @@
 #include <string>
 
 int main(int argc, const char* argv[]) {
+    // CLI::App是一个命令行解析器，用于解析命令行参数
     auto app = CLI::App{"A simple code statistics tool"};
 
     auto path = std::string{};
@@ -31,8 +32,10 @@ int main(int argc, const char* argv[]) {
         auto driver = driver::Driver(conf, stats::MakeCodeAnalyzer(language));
         driver.Run();
     } catch (const CLI::ParseError& e) {
+        // app.exit(e)会打印错误信息并退出程序
         return app.exit(e);
     } catch (const std::exception& e) {
+        // e.what()返回异常信息
         std::cerr << e.what() << std::endl;
         return -1;
     }

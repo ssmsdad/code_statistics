@@ -1,6 +1,9 @@
 // 2024/1/4
 // zhangzhong
 
+// driver文件夹中通常要存放与具体业务逻辑相关的代码，比如解析命令行参数、调用stats模块进行代码统计等\
+   反应到java中，driver文件夹中的代码通常是controller层的代码
+
 #include "driver/driver.hpp"
 #include <fmt/core.h>
 
@@ -39,6 +42,7 @@ auto Driver::AnalyzePath(const fs::path& path) -> void {
     if (!FilterExtension(path.extension().string()))
         return;
     auto result = analyzer_->Analyze(path);
+    // 每一个支持的文件都会有一个result
     results_->push_back(result);
     result->Statistics();
 }
@@ -54,6 +58,7 @@ auto Driver::FilterExtension(std::string const& extension) -> bool {
 
 //打印结果
 auto Driver::PrintResults() -> void {
+    // 使用列表初始化语法，避免了隐式类型转换，提高代码的可读性与安全性
     auto all_file_count = size_t{0};
     auto all_line_count = size_t{0};
     auto all_code_count = size_t{0};

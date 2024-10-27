@@ -11,6 +11,7 @@ PythonAnalyzer::PythonAnalyzer() : CodeAnalyzer("#", "", "") {}
 
 auto PythonAnalyzer::IsStringHead(std::string_view const& line, size_t offset)
     -> bool {
+    // python中""""""和''''''属于注释，不是字符串
     if (line[offset] == '\"') {
         // make sure it is not a block comment head
         if (offset + 2 < line.size()) {

@@ -32,6 +32,7 @@ auto AnalysisResult::ToString() const -> std::string {
                        static_cast<LineCategory>(line_categories[i]))
                 << std::endl;
     }
+    // 将path与path的值写入到context流中
     context << "path: " << path << std::endl;
     context << "file lines: " << line_count << std::endl;
     context << "code lines: " << code_count << std::endl;
