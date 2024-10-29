@@ -47,7 +47,7 @@ for more infomation, use `code_statistics -h` to see help.
 
 # 有个问题
 
-该怎么调试？cmakelists文件中只要写了#set(CMAKE_BUILD_TYPE Debug)，就报错：
+该怎么调试？cmakelists文件中只要写了`set(CMAKE_BUILD_TYPE Debug)`，就报错：
 ```
 /home/zhangwenzhe/learning_c++/code_statistics/src/stats/src/code_analyzer.cpp:11:10: fatal error: fmt/core.h: No such file or directory
 11 | #include <fmt/core.h>
@@ -71,5 +71,5 @@ for more infomation, use `code_statistics -h` to see help.
     -6、如果当前的字符是块注释（走IsBlockCommentHead），那么就跳过这个块注释，设置为块注释，
 
     -7、以上都添加了多行的处理，如果当前行找不到指定的结束符号，那么就继续读取下一行
-    
+
     -8、但是对于每个字符都要更新一次result_->line_categories[line]的值，会不会很慢？
