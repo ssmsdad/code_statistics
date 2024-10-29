@@ -27,6 +27,7 @@ struct AnalysisResult {
     size_t code_count{};
     size_t blank_count{};
     size_t comment_count{};
+    size_t code_with_comment_count{};
     //每一行的类型
     std::vector<uint8_t> line_categories;
 

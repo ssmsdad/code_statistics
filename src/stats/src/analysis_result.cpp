@@ -62,6 +62,8 @@ auto AnalysisResult::Statistics() noexcept -> void {
         if (static_cast<uint>(category) &
             static_cast<uint>(LineCategory::kCode))
             ++code_count;
+        if (category == 3)
+            ++code_with_comment_count;
     }
 }
 

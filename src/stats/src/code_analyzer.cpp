@@ -3,6 +3,7 @@
 
 #include "stats/code_analyzer.hpp"
 #include "stats/all_analyzer.hpp"
+#include "stats/analysis_result.hpp"
 #include "stats/cpp_analyzer.hpp"
 #include "stats/python_analyzer.hpp"
 #include "stats/rust_analyzer.hpp"
@@ -52,6 +53,7 @@ auto CodeAnalyzer::AnalyzeFile(std::istream& is)
     // 读取文件的每一行\
        判断当前行是否为空白行，如果不是空白行，那么就判断这行代码的类型
     while (GetLineAndResetOffset(is, line, offset)) {
+        // 注意这里的while循环会对一行中的所有字符进行判断，并不是一行只执行一次，因为offset在每次while循环后一定会更新
         while ((offset = FindFirstNotBlank(line, offset)) !=
                std::string::npos) {
             if (IsStringHead(line, offset)) {
@@ -143,7 +145,8 @@ auto CodeAnalyzer::IsBlockCommentHead(std::string_view const& line,
 auto CodeAnalyzer::SkipString(std::istream& is, std::string& line,
                               size_t offset) -> size_t {
     // delimiter is ' or "
-    // std::string_view 提供了对字符串数据的只读访问，而不需要复制字符串数据，提高性能
+    // std::string_view
+    // 提供了对字符串数据的只读访问，而不需要复制字符串数据，提高性能
     // std::string_view 是轻量级的，不涉及内存分配和释放操作
     auto delimiter = std::string_view{line.substr(offset, 1)};
     auto is_find_delimiter = false;
@@ -168,7 +171,7 @@ auto CodeAnalyzer::SkipString(std::istream& is, std::string& line,
                 ++slash_size;
                 --current_index;
             }
-            
+
             // 如果\的数量是偶数，那么说明当前找到的这个delimiter是字符串的结束符，否则其被转义了，不是字符串的结束符
             if (slash_size % 2 == 0) {
                 // if slash_size is even, then it is not escape sequence
@@ -203,7 +206,7 @@ auto CodeAnalyzer::SkipRawString(std::istream& is, std::string& line,
     // raw string: r"..."
     // offset -> r, but r should not couat as a part of raw string
     auto raw_string_head = std::string{line.substr(offset + 1, 1)};
-    // 翻转字符串 
+    // 翻转字符串
     auto raw_string_tail =
         std::string{raw_string_head.rbegin(), raw_string_head.rend()};
     return SkipUntilFindDelimiter(is, line, offset + 1 + raw_string_head.size(),
@@ -214,16 +217,16 @@ auto CodeAnalyzer::SkipLineComment(std::istream& is, std::string& line,
                                    size_t offset) -> size_t {
     // deal with '\' at the end of line
     // 反斜杠在许多编程语言中用作续行符，表示当前行与下一行是连续的
-    // 0 fkodlk\
+     // 0 fkodlk\
     1 f,l;'sd\
     2 kdsgl;\
     3 lk;dfsg
     // line_begin = 0 , line_end = 4
-    // line_begin = line_end - 1 \
+     // line_begin = line_end - 1 \
         line_begin = 3 , line_end = 4
-    // line_begin = line_end \
+     // line_begin = line_end \
         line_begin = 4 , line_end = 4
-    // 下一轮时：\
+     // 下一轮时：\
         line_begin = 4 , line_end = 5
     while (line.back() == '\\') {
         GetLineAndResetOffset(is, line, offset);
@@ -242,7 +245,8 @@ auto CodeAnalyzer::SkipBlockComment(std::istream& is, std::string& line,
 }
 
 // 跳过原始字符串、块注释，因为原始字符串和块注释是多行的，所以需要一直读取直到找到结束符
-// 原始字符串中一定有(),可能是R"(This is a "raw" "string" literal)"或者R"delimiter(This is a raw string with a delimiter)delimiter"
+// 原始字符串中一定有(),可能是R"(This is a "raw" "string"
+// literal)"或者R"delimiter(This is a raw string with a delimiter)delimiter"
 auto CodeAnalyzer::SkipUntilFindDelimiter(std::istream& is, std::string& line,
                                           size_t offset,
                                           std::string_view const& delimiter,
@@ -285,13 +289,16 @@ auto MakeCodeAnalyzer(std::string const& language)
 
 } // namespace stats
 
-
 /*
 如何判断此行的代码类型？
 1. 如果是什么都没有，那么计算为空白行
-2. 如果是字符串的开头，那么就计算为代码行，这里加了多行字符串的处理，如果当前行找不到字符串的结束符号，那么就继续读取下一行
-3. 如果是原始字符串的开头，那么就计算为代码行，同样加了多行字符串处理，即检测原始字符串的结束符号是否在这一行，如果不在，那么就继续读取下一行
-4. 如果是行注释的开头，那么就计算为行注释，加了多行注释处理，即在有末尾有“\”的行也都计算为注释行
-5. 如果是块注释的开头，那么就计算为块注释，这个也加了多行注释处理，即检测他的段注释结束符号是否在这一行，如果不在，那么就继续读取下一行
-6. 如果都不是，那么就是代码行
+2.
+遍历这一行中的所有字符，对于每一个字符，都会设置一次result_->line_categories[line]的值，
+如果当前的字符不属于字符串，也不是任何的注释符号，那么就设置为代码行（这里走的是else），如果后边还有注释（走IsLineCommentHead），就设置注释行，二者按位取或，变为3，即代码行和注释行
+如果当前的字符属于字符串（走IsStringHead），那么就跳过这个字符串，设置为代码行，
+如果当前的字符是原始字符串（走IsRawStringHead），那么就跳过这个原始字符串，设置为代码行，
+如果当前的字符是行注释（走IsLineCommentHead），那么就跳过这个行注释，设置为行注释，
+如果当前的字符是块注释（走IsBlockCommentHead），那么就跳过这个块注释，设置为块注释，
+以上都添加了多行的处理，如果当前行找不到指定的结束符号，那么就继续读取下一行
+下边的同样是这个原理，但是对于每个字符都要更新一次result_->line_categories[line]的值，会不会很慢？
 */

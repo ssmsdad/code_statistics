@@ -13,6 +13,10 @@ target_include_directories(stats
     PUBLIC include
 )
 
+target_link_libraries(stats
+    PUBLIC fmt::fmt
+)
+
 # stats unit tests
 add_executable(test_stats 
     test/test_stats.cpp
